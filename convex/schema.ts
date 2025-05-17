@@ -9,6 +9,7 @@ const schema = defineSchema({
         description: v.string(),
         creatorId: v.id('users'),
         assigneeId: v.id('users'),
+        dueDate: v.optional(v.number()),
         status: v.union(v.literal('todo'), v.literal('in-progress'), v.literal('done')),
         attachments: v.array(v.id("_storage")),
     })
