@@ -39,3 +39,23 @@ export const list = query({
             .collect();
     }
 });
+
+export const search = query({
+    args:{
+        query: v.string(),
+    },
+    handler: async(ctx, args) => {
+        const userId = await getAuthUserId(ctx);
+        if (!userId) {
+            throw new Error('User not authenticated');
+        }
+
+        return await ctx.db
+        .query("tasks")
+        .withSearchIndex("search", q => q.search("title", args.query))
+        .filter(q => q.eq(q.field('creatorId'), userId))
+        .collect();
+    }
+});
+
+
