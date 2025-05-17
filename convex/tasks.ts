@@ -1,5 +1,5 @@
 import {v} from 'convex/values';
-import {mutation} from './_generated/server';
+import {mutation, query} from './_generated/server';
 import { getAuthUserId } from '@convex-dev/auth/server';
 
 export const create = mutation({
@@ -23,4 +23,19 @@ export const create = mutation({
             attachments: [],
         })
     }
-})
+});
+
+export const list = query({
+    args:{},
+    handler: async(ctx) => {
+        const userId = await getAuthUserId(ctx);
+        if (!userId) {
+            throw new Error('User not authenticated');
+        }
+
+        return await ctx.db
+            .query("tasks")
+            .filter(q => q.eq(q.field('creatorId'), userId))
+            .collect();
+    }
+});
