@@ -89,3 +89,25 @@ export const update = mutation ({
         await ctx.db.patch(id, updates);
     }
 });
+
+export const addAttachment = mutation({
+    args: {
+        taskId: v.id('tasks'),
+        storageId: v.id('_storage'),
+    },
+    handler: async(ctx, args) => {
+        const userId = await getAuthUserId(ctx);
+        if (!userId) {
+            throw new Error('User not authenticated');
+        }
+
+        const task = await ctx.db.get(args.taskId);
+        if (!task) {
+            throw new Error('Task not found');
+        }
+
+        await ctx.db.patch(args.taskId, {
+            attachments: [...task.attachments, args.storageId],
+        });
+    }
+});
